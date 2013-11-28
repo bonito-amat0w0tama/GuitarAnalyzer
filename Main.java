@@ -1,29 +1,13 @@
 import java.io.*;
-import java.nio.*;
 import java.net.*;
-import jp.crestmuse.cmx.processing.*;
-import jp.crestmuse.cmx.filewrappers.*;
-import jp.crestmuse.cmx.sound.*;
+
 import jp.crestmuse.cmx.amusaj.sp.*;
-import javax.sound.sampled.*;
-import jp.crestmuse.cmx.processing.*;
+import jp.crestmuse.cmx.filewrappers.*;
 import jp.crestmuse.cmx.math.*;
+import jp.crestmuse.cmx.processing.*;
 
-public class GuitarAudioAnalyzer {
 
-	GuitarAudioAnalyzer() {
-	}
-
-	public WAVWrapper readWav(String wavPath) {
-		try {
-            WAVWrapper wavWrpr = WAVWrapper.readfile(wavPath);
-            return wavWrpr;
-		} catch(IOException e) {
-			System.out.println("Wavファイルの読み込みミス");
-			e.printStackTrace();
-			return null;
-		}
-	}
+public class Main {
 
 	public static void main(String[] args) {
 		GuitarAudioAnalyzer gaa = new GuitarAudioAnalyzer();
@@ -31,21 +15,19 @@ public class GuitarAudioAnalyzer {
 		WAVWrapper wav = gaa.readWav("./data/zenon.wav");
 		WindowSlider winSldr = new WindowSlider(false);
 		STFT stft = new STFT(false);	
-		SpectrogramGenerator sg = new SpectrogramGenerator();
+		SpectrogramGenerator SG = new SpectrogramGenerator();
         InputChecker foo = new InputChecker();
 		CMXController cmx = CMXController.getInstance();
 
-		// STFTのための設定の読み込み
        	cmx.readConfig("./data/config.xml");
 		winSldr.setInputData(wav);
-
 		SPExecutor ex = new SPExecutor();
 		ex.addSPModule(winSldr);
 		ex.addSPModule(stft);
-		ex.addSPModule(sg);
+		ex.addSPModule(SG);
         //cmx.addSPModule(foo);
 		ex.connect(winSldr, 0, stft, 0);
-		ex.connect(stft, 0, sg, 0);
+		ex.connect(stft, 0, SG, 0);
 		ex.start();
         
         // 無理矢理な方法
@@ -56,7 +38,7 @@ public class GuitarAudioAnalyzer {
             }
 		}
 
-		DoubleMatrix specgram = sg.getSpectrogram();
+		DoubleMatrix specgram = SG.getSpectrogram();
         String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
 
 
@@ -74,7 +56,7 @@ public class GuitarAudioAnalyzer {
             eca.close();
         } catch(ConnectException e) {
         	System.out.println("Pythonサーバーとのコネクションエラー");
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch(IOException e) {
         	e.printStackTrace();
         }

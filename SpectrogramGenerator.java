@@ -8,21 +8,25 @@ public class SpectrogramGenerator extends SPModule{
     int count = 0;
 
 	public void execute(Object[] src, TimeSeriesCompatible[] dest) {
-                ///System.out.println(count);
-                count++;
-                list.add((ComplexArray)src[0]);
-    }
+	    ///System.out.println(count);
+        count++;
+        list.add((ComplexArray)src[0]);
+	}
 
     // メインで走らせる
     DoubleMatrix getSpectrogram() {
-        DoubleMatrix matrix = MathUtils.createDoubleMatrix(list.get(0).length(), list.size());
-        for (int j = 0; j < list.size(); j++) {
-            ComplexArray array = list.get(j);
-            for (int i = 0; i < array.length(); i++) {
-                matrix.set(i, j, sqrt(array.getReal(i) * array.getReal(i) + array.getImag(i) * array.getImag(i)));
-            }
-        }
-        return matrix;
+    	try {
+	        DoubleMatrix matrix = MathUtils.createDoubleMatrix(list.get(0).length(), list.size());
+	        for (int j = 0; j < list.size(); j++) {
+	            ComplexArray array = list.get(j);
+	            for (int i = 0; i < array.length(); i++) {
+	                matrix.set(i, j, sqrt(array.getReal(i) * array.getReal(i) + array.getImag(i) * array.getImag(i)));
+	            }
+	        }
+	        return matrix;
+    	} catch(Exception e) {
+    		return null;
+    	}
     }
 	public Class[] getInputClasses() {
 		return new Class[] { ComplexArray.class };
