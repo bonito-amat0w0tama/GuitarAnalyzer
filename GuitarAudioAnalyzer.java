@@ -10,8 +10,11 @@ import jp.crestmuse.cmx.processing.*;
 import jp.crestmuse.cmx.math.*;
 
 public class GuitarAudioAnalyzer {
+	WAVWrapper wav;
+
 
 	GuitarAudioAnalyzer() {
+
 	}
 
 	public WAVWrapper readWav(String wavPath) {

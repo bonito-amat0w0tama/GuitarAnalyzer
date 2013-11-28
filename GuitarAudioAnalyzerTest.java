@@ -5,13 +5,23 @@ import org.junit.Test;
 
 
 public class GuitarAudioAnalyzerTest {
+	private GuitarAudioAnalyzer gaa  = new GuitarAudioAnalyzer();
 
 	@Test
-	public void テストwavの読み込み() {
-		GuitarAudioAnalyzer gaa = new GuitarAudioAnalyzer();
-		WAVWrapper wav = gaa.readWav("data/zenon.wav");
+	public void setUp() {
+		//gaa = new GuitarAudioAnalyzer();
+	}
+	
+	@Test
+	public void テストwavの読み込みに成功したらNull以外を返す() {
+		 WAVWrapper wav = gaa.readWav("data/zenon.wav");
 		//System.out.println(wav);
 		assertNotNull(wav);
+	}
+	@Test
+	public void テストWavの読み込みに失敗したらNullを返す() {
+		WAVWrapper wav = gaa.readWav("hoge");
+		assertNull(wav);
 	}
 	
 	@Test
