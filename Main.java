@@ -10,9 +10,9 @@ import jp.crestmuse.cmx.processing.*;
 public class Main {
 
 	public static void main(String[] args) {
-		GuitarAudioAnalyzer gaa = new GuitarAudioAnalyzer();
+		GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
 
-		WAVWrapper wav = gaa.readWav("./data/zenon.wav");
+		gaa.readWav("./data/zenon.wav");
 		WindowSlider winSldr = new WindowSlider(false);
 		STFT stft = new STFT(false);	
 		SpectrogramGenerator SG = new SpectrogramGenerator();

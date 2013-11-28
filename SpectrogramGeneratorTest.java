@@ -33,7 +33,7 @@ public class SpectrogramGeneratorTest {
 	
 	@Test
 	public void testスペクトログラムのエラー出力() {
-		GuitarAudioAnalyzer gaa = new GuitarAudioAnalyzer();
+		GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
 
 		WAVWrapper wav = gaa.readWav("");
 		WindowSlider winSldr = new WindowSlider(false);
