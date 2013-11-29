@@ -30,41 +30,4 @@ public class SpectrogramGeneratorTest {
 		DoubleMatrix specg = null;
 		assertThat(specg, is(any(DoubleMatrix.class)));
 	}
-	
-	@Test
-	public void testスペクトログラムのエラー出力() {
-		GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
-
-		WAVWrapper wav = gaa.readWav("");
-		WindowSlider winSldr = new WindowSlider(false);
-		STFT stft = new STFT(false);	
-		SpectrogramGenerator sg = new SpectrogramGenerator();
-        InputChecker foo = new InputChecker();
-		CMXController cmx = CMXController.getInstance();
-
-		// STFTのための設定の読み込み
-       	cmx.readConfig("./data/config.xml");
-		winSldr.setInputData(wav);
-
-		SPExecutor ex = new SPExecutor();
-		ex.addSPModule(winSldr);
-		ex.addSPModule(stft);
-		ex.addSPModule(sg);
-        //cmx.addSPModule(foo);
-		ex.connect(winSldr, 0, stft, 0);
-		ex.connect(stft, 0, sg, 0);
-		ex.start();
-        
-        // 無理矢理な方法
-		while (!ex.finished()) {
-		    try {
-                Thread.currentThread().sleep(100);
-		    } catch (InterruptedException e) {
-            }
-		}
-		DoubleMatrix spec = sg.getSpectrogram(); 
-		
-		assertNull(spec);
-	}
-
 }

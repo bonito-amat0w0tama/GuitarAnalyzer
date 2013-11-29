@@ -20,11 +20,15 @@ public class GuitarAllNoteAnalyzerTest {
 		//gaa = new GuitarAudioAnalyzer();
 	}
 	
-	
 	@Test
-	public void test全音をNMFで解析をし基底ベクトルを得る() {
+	public void test全音をNMFで解析をしDoubleMatrix型のベクトルを得る() {
 		DoubleMatrix base = gaa.analyzeAllNote("./data/zenon.wav");
 		assertThat(base, is(any(DoubleMatrix.class)));
+	}
+	@Test
+	public void test全音をNMFで解析に失敗した時Nullを返す() {
+		DoubleMatrix base = gaa.analyzeAllNote("");
+		assertNull(base);
 	}
 	
 }

@@ -10,14 +10,14 @@ import jp.crestmuse.cmx.processing.*;
 import jp.crestmuse.cmx.math.*;
 
 public class GuitarAllNoteAnalyzer {
-	WAVWrapper wav;
+	private WAVWrapper wav;
 	private SPExecutor ex = new SPExecutor();
 	// wavを読み込むためにメンバ変数である必要あり
-	WindowSlider winSldr;
-	SpectrogramGenerator sg;
-	STFT stft;
-	CMXController cmx;
-	DoubleMatrix allNoteWav;
+	private WindowSlider winSldr;
+	private SpectrogramGenerator sg;
+	private STFT stft;
+	private CMXController cmx;
+	private DoubleMatrix allNoteWav;
 
 	GuitarAllNoteAnalyzer() {
 		cmx = CMXController.getInstance();
@@ -28,7 +28,8 @@ public class GuitarAllNoteAnalyzer {
 		} catch(IOException e) {
 			System.out.println("Wavファイルの読み込みミス");
 			e.printStackTrace();
-			wav = null;
+			//wav = null;
+			//throw new IOException("Wavファイルの読み込みに失敗しました");
 		}
 	}
 	private void setSPModuleToSPExecutor(ProducerConsumerCompatible mdl) {
@@ -39,7 +40,7 @@ public class GuitarAllNoteAnalyzer {
 		this.winSldr = new WindowSlider(false);
 		this.setSPModuleToSPExecutor(winSldr);
 	}
-	private void setInputDataToWindowSlider() {
+	private void setInputDataToWindowSlider() throws NullPointerException {
 		this.winSldr.setInputData(this.wav);
 	}
 	private void setSTFT() {
@@ -52,28 +53,34 @@ public class GuitarAllNoteAnalyzer {
 		this.sg = new SpectrogramGenerator();
 		this.setSPModuleToSPExecutor(this.sg);
 	}
-	private void connectModule() {
+	private void connectAllModules() {
 		this.ex.connect(winSldr, 0, stft, 0);
 		this.ex.connect(stft, 0, sg, 0);
 	}
 
-	public void setupAllModules() {
+	private void setAllModules() {
 		this.setWindowSlider();
 		this.setSTFT();
 		this.setSpectrogramGenerator();
-
-		this.connectModule();
 	}
 	
 	public DoubleMatrix analyzeAllNote(String wavPath) {
 		this.readWav(wavPath);
-		this.setupAllModules();
-		this.setInputDataToWindowSlider();
+
+		this.setAllModules();
+		this.connectAllModules();
+		// ヌルポが出たらWavの読み込みに失敗しているので終了
+		try {
+			this.setInputDataToWindowSlider();
+		} catch(NullPointerException e) {
+			System.out.println("nulupo");
+			e.printStackTrace();
+			return null;
+		}
 		this.ex.start();
 		
 	    // 無理矢理な方法
 		while (!ex.finished()) {
-			System.out.println("hello");
 		    try {
                 Thread.currentThread().sleep(100);
 		    } catch (InterruptedException e) {
