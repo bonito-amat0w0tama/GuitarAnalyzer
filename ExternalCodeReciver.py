@@ -139,6 +139,7 @@ class externalCodeReceiver():
             except socket.error:
                 #print str(type(e))
                 print "Javaプログラムが不正終了した"
+                self.connectClient()
 
         self.clientsock.close()
 
