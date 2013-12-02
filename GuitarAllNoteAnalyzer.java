@@ -1,94 +1,57 @@
-import java.io.*;
-import java.nio.*;
-import java.net.*;
-import jp.crestmuse.cmx.processing.*;
-import jp.crestmuse.cmx.filewrappers.*;
-import jp.crestmuse.cmx.sound.*;
+import java.io.IOException;
+
 import jp.crestmuse.cmx.amusaj.sp.*;
-import javax.sound.sampled.*;
-import jp.crestmuse.cmx.processing.*;
-import jp.crestmuse.cmx.math.*;
+import jp.crestmuse.cmx.math.DoubleMatrix;
 
-public class GuitarAllNoteAnalyzer {
-	private WAVWrapper wav;
-	private SPExecutor ex = new SPExecutor();
-	// wavを読み込むためにメンバ変数である必要あり
-	private WindowSlider winSldr;
-	private SpectrogramGenerator sg;
-	private STFT stft;
-	private CMXController cmx;
-	private DoubleMatrix allNoteWav;
 
-	GuitarAllNoteAnalyzer() {
-		cmx = CMXController.getInstance();
+public class GuitarAllNoteAnalyzer extends GuitarAudioAnalyzer {
+	private SpectrogramGenerator _sg;
+	public GuitarAllNoteAnalyzer() {
+		this.setupAllModules();
 	}
-	private void readWav(String wavPath) {
+	protected void setupAllModules() {
+		this._winSldr = new WindowSlider(false);
+		this._ex.addSPModule(_winSldr);
+
+		this._cmx.readConfig("data/config.xml");
+		this._stft = new STFT(false);
+		this._ex.addSPModule(this._stft);
+
+		this._sg = new SpectrogramGenerator();
+		this._ex.addSPModule(this._sg);
+		
+		this._ex.connect(this._winSldr, 0, this._stft, 0);
+		this._ex.connect(this._stft, 0, this._sg, 0);
+
+	}
+	public DoubleMatrix analyzeGuitarAudio(String wavPath) {
 		try {
-            this.wav =  WAVWrapper.readfile(wavPath);
+			this.readWav(wavPath);
 		} catch(IOException e) {
-			System.out.println("Wavファイルの読み込みミス");
-			e.printStackTrace();
-			//wav = null;
-			//throw new IOException("Wavファイルの読み込みに失敗しました");
-		}
-	}
-	private void setSPModuleToSPExecutor(ProducerConsumerCompatible mdl) {
-		this.ex.addSPModule(mdl);
-	}
-
-	private void setWindowSlider() {
-		this.winSldr = new WindowSlider(false);
-		this.setSPModuleToSPExecutor(winSldr);
-	}
-	private void setInputDataToWindowSlider() throws NullPointerException {
-		this.winSldr.setInputData(this.wav);
-	}
-	private void setSTFT() {
-		// STFTのための設定の読み込み
-       	this.cmx.readConfig("./data/config.xml");	
-       	this.stft = new STFT(false);	
-		this.setSPModuleToSPExecutor(this.stft);
-	}
-	private void setSpectrogramGenerator() {
-		this.sg = new SpectrogramGenerator();
-		this.setSPModuleToSPExecutor(this.sg);
-	}
-	private void connectAllModules() {
-		this.ex.connect(winSldr, 0, stft, 0);
-		this.ex.connect(stft, 0, sg, 0);
-	}
-
-	private void setAllModules() {
-		this.setWindowSlider();
-		this.setSTFT();
-		this.setSpectrogramGenerator();
-	}
-	
-	public DoubleMatrix analyzeAllNote(String wavPath) {
-		this.readWav(wavPath);
-
-		this.setAllModules();
-		this.connectAllModules();
-		// ヌルポが出たらWavの読み込みに失敗しているので終了
-		try {
-			this.setInputDataToWindowSlider();
-		} catch(NullPointerException e) {
-			System.out.println("nulupo");
+			// Wavの読み込みに失敗したらNullを返す
 			e.printStackTrace();
 			return null;
 		}
-		this.ex.start();
 		
-	    // 無理矢理な方法
-		while (!ex.finished()) {
-		    try {
-                Thread.currentThread().sleep(100);
-		    } catch (InterruptedException e) {
-
-		    }
+		if (!(this._wav == null)) {
+			this._winSldr.setInputData(this._wav);
+		} else {
+			return null;
 		}
-		this.allNoteWav = sg.getSpectrogram();
+		this._ex.start();
 		
-		return allNoteWav;
+		// 無理矢理な方法
+		while (!this._ex.finished()) {
+			try {
+				Thread.currentThread().sleep(100);
+			} catch (InterruptedException e) {
+
+			}
+		}
+		DoubleMatrix mat = this._sg.getSpectrogram();
+
+		return mat;
+		
 	}
+	
 }
