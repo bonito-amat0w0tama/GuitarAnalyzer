@@ -43,6 +43,7 @@ public class SpectrumConverterTest {
 		} catch(Exception e) {
 		}
 		Double sq = Math.sqrt(real * real + imag * imag);
-		assertThat(dbl.get(0), is(3.0));
+		System.out.println("dbl" + dbl.get(0) + "\n" + "sq:" + sq);
+		assertThat(dbl.get(0), is(sq));
 	}
 }

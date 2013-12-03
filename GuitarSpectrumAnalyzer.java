@@ -29,6 +29,7 @@ public class GuitarSpectrumAnalyzer extends GuitarAudioAnalyzer {
 
 	@Override
 	public DoubleMatrix analyzeGuitarAudio(String wavPath) {
+		this.setupAllModules();
 		try {
 			this.readWav(wavPath);
 		} catch(IOException e) {
@@ -51,31 +52,10 @@ public class GuitarSpectrumAnalyzer extends GuitarAudioAnalyzer {
 			} catch (InterruptedException e) {
 
 			}
-		}		try {
-			this.readWav(wavPath);
-		} catch(IOException e) {
-			// Wavの読み込みに失敗したらNullを返す
-			e.printStackTrace();
-			return null;
 		}
 		
-		if (!(this._wav == null)) {
-			this._winSldr.setInputData(this._wav);
-		} else {
-			return null;
-		}
-		this._ex.start();
-		
-		// 無理矢理な方法
-		while (!this._ex.finished()) {
-			try {
-				Thread.currentThread().sleep(100);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		DoubleMatrix mat = this._sg.getSpectrogram();
-		return mat;
+		DoubleMatrix dbl = this._sa.createDoubleMatrix();
+		return dbl;
 	}		
 }
 
