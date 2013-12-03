@@ -21,11 +21,10 @@ public class MainTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
-
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Test
+	public void test() { 
 		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
         String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
 
@@ -47,6 +46,9 @@ public class MainTest {
         } catch(IOException e) {
         	e.printStackTrace();
         }
+        DoubleMatrix audioMat = this.gsa.analyzeGuitarAudio("data/zenon.wav");
+        DoubleMatrix result = null;
+        //System.out.println(audioMat);
 	}
 
 
