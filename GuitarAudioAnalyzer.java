@@ -21,7 +21,6 @@ public abstract class GuitarAudioAnalyzer {
 			throw new IOException("Wavファイルの読み込みに失敗しました");
 		}
 	}
-	
 	protected abstract void setupAllModules();
 	public abstract DoubleMatrix analyzeGuitarAudio(String wavPath);
 

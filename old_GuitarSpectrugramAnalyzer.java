@@ -4,17 +4,17 @@ import jp.crestmuse.cmx.amusaj.sp.*;
 import jp.crestmuse.cmx.filewrappers.WAVWrapper;
 import jp.crestmuse.cmx.processing.*;
 
-public class GuitarSpectrugramAnalyzer {
+public class old_GuitarSpectrugramAnalyzer {
 	private SPExecutor ex;
 	private WindowSlider winsl;
 	private STFT stft;
-	private ComplexSpectrumToAmplitudeSpectrumConverter csasc;
+	private SpectrumConverter csasc;
 	private WAVWrapper wav;
 	private CMXController cmx;
 	
 	private SpectrogramGenerator sg;
 
-	GuitarSpectrugramAnalyzer() {
+	old_GuitarSpectrugramAnalyzer() {
 		ex = new SPExecutor();
 		cmx = cmx.getInstance();
 	}
@@ -46,7 +46,7 @@ public class GuitarSpectrugramAnalyzer {
 		this.setupSPModuleToSPExecutor(this.stft);
 	}
 	private void setupSpectrumConverter() {
-		this.csasc = new ComplexSpectrumToAmplitudeSpectrumConverter();
+		this.csasc = new SpectrumConverter();
 		this.setupSPModuleToSPExecutor(this.csasc);
 	}
 	private void setSpectrogramGenerator() {
@@ -69,7 +69,7 @@ public class GuitarSpectrugramAnalyzer {
 		this.ex.start();
 	}
 	public static void main(String args[]) {
-		GuitarSpectrugramAnalyzer gaa = new GuitarSpectrugramAnalyzer();
+		old_GuitarSpectrugramAnalyzer gaa = new old_GuitarSpectrugramAnalyzer();
 		gaa.readWav("data/zenon.wav");
 		gaa.setupAllModules();
 		gaa.connectAllModules();

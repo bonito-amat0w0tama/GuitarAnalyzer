@@ -9,7 +9,7 @@ import org.junit.Test;
 import jp.crestmuse.cmx.math.*;
 
 public class ComplexSpectrumToAmplitudeSpectrumConverterTest {
-	GuitarSpectrugramAnalyzer gaa = new GuitarSpectrugramAnalyzer();
+	GuitarSpectrumAnalyzer gaa = new GuitarSpectrumAnalyzer();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -18,10 +18,10 @@ public class ComplexSpectrumToAmplitudeSpectrumConverterTest {
 	@Before
 	public void setUp() throws Exception {
 		try {
-			Method m1 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			Method m1 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"setAllModules"
 			);	
-			Method m2 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			Method m2 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"connectAllModules"
 			);	
 			m1.setAccessible(true);

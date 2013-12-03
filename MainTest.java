@@ -1,19 +1,32 @@
-import java.io.*;
-import java.net.*;
+import static org.junit.Assert.*;
 
-import jp.crestmuse.cmx.amusaj.sp.*;
-import jp.crestmuse.cmx.filewrappers.*;
+import java.io.IOException;
+import java.net.ConnectException;
+
 import jp.crestmuse.cmx.math.*;
-import jp.crestmuse.cmx.processing.*;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.core.Is.is;
 
 
-public class Main {
+public class MainTest {
+	private GuitarAudioAnalyzer gaa = new GuitarAllNoteAnalyzer();
+	private GuitarAudioAnalyzer gsa = new GuitarSpectrumAnalyzer();
+	private DoubleMatrix H, W;
 
-	public static void main(String[] args) {
-		GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
 
+
+	}
+
+	@Before
+	public void setUp() throws Exception {
 		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
-
         String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
 
         // Tcp/ipで飛ばう
@@ -22,9 +35,9 @@ public class Main {
                 new ExternalCodeAdapter("localhost", 1111);
             eca.pushDoubleMatrix(allNote);
             eca.pushCode(code);
-            DoubleMatrix H = (DoubleMatrix)eca.pop();
+            H = (DoubleMatrix)eca.pop();
             System.out.println("H: " + MathUtils.toString1(H));
-            DoubleMatrix W = (DoubleMatrix)eca.pop();
+            W = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));
             //eca.pushEnd();
             eca.close();
@@ -34,7 +47,6 @@ public class Main {
         } catch(IOException e) {
         	e.printStackTrace();
         }
-
 	}
 
 

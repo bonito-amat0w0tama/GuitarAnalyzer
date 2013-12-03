@@ -1,6 +1,9 @@
 
 import static org.junit.Assert.*;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.core.Is.is;
+
 import java.io.IOException;
 import java.net.ConnectException;
 
@@ -10,12 +13,6 @@ import jp.crestmuse.cmx.math.MathUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.core.Is.is;
-
-
 
 public class GuitarAllNoteAnalyzerTest {
 	private GuitarAudioAnalyzer gaa  = new GuitarAllNoteAnalyzer();
@@ -41,6 +38,7 @@ public class GuitarAllNoteAnalyzerTest {
         
         DoubleMatrix H = null;
         DoubleMatrix W = null;
+
         // Tcp/ipで飛ばう
         try {
             ExternalCodeAdapter eca = 
@@ -62,6 +60,4 @@ public class GuitarAllNoteAnalyzerTest {
         assertThat(H, is(notNullValue())); 
         assertThat(W, is(notNullValue()));
 	}
-	
-	
 }

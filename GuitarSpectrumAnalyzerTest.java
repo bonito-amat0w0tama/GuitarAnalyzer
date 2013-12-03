@@ -11,7 +11,7 @@ import org.junit.Test;
 
 
 public class GuitarSpectrumAnalyzerTest {
-	GuitarSpectrugramAnalyzer gaa;
+	GuitarSpectrumAnalyzer gaa;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -21,13 +21,13 @@ public class GuitarSpectrumAnalyzerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		gaa = new GuitarSpectrugramAnalyzer();
+		gaa = new GuitarSpectrumAnalyzer();
 	}
 
 	@Test
 	public void test_setAllModuleを実行してエラーなしで完了する() {
 		try {
-			Method m = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			Method m = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"setAllModules"
 			);	
 			m.setAccessible(true);
@@ -41,10 +41,10 @@ public class GuitarSpectrumAnalyzerTest {
 	public void test_connectAllModuleを実行してエラーなしで完了する() {
 		Method m1, m2;
 		try {
-			m1 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			m1 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"setAllModules"
 				);
-			m2 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			m2 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 			"connectAllModules"
 				);
 			m1.setAccessible(true);
@@ -72,10 +72,10 @@ public class GuitarSpectrumAnalyzerTest {
 	public void test_setAllModuleのテスト() {
 		Method m1, m2;
 		try {
-			m1 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			m1 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"setAllModules"
 				);
-			m2 = GuitarSpectrugramAnalyzer.class.getDeclaredMethod(
+			m2 = GuitarSpectrumAnalyzer.class.getDeclaredMethod(
 				"connectAllModules"
 				);
 			m1.setAccessible(true);
