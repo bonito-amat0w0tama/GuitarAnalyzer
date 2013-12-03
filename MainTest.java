@@ -14,42 +14,40 @@ import static org.hamcrest.core.Is.is;
 
 
 public class MainTest {
-	private GuitarAudioAnalyzer gaa = new GuitarAllNoteAnalyzer();
-	private GuitarAudioAnalyzer gsa = new GuitarSpectrumAnalyzer();
-	private DoubleMatrix H, W;
+    private GuitarAudioAnalyzer gaa = new GuitarAllNoteAnalyzer();
+    private GuitarAudioAnalyzer gsa = new GuitarSpectrumAnalyzer();
+    private DoubleMatrix H, W;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
 
-	}
+    }
 
-	@Test
-	public void test() { 
-		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
+    @Test
+    public void DoubleMatrixが返って来るかどうか() {
+        DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
         String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
 
         // Tcp/ipで飛ばう
         try {
-            ExternalCodeAdapter eca = 
+            ExternalCodeAdapter eca =
                 new ExternalCodeAdapter("localhost", 1111);
             eca.pushDoubleMatrix(allNote);
             eca.pushCode(code);
-            H = (DoubleMatrix)eca.pop();
+            DoubleMatrix H = (DoubleMatrix)eca.pop();
             System.out.println("H: " + MathUtils.toString1(H));
-            W = (DoubleMatrix)eca.pop();
+            DoubleMatrix W = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));
             //eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {
-        	System.out.println("Pythonサーバーとのコネクションエラー");
+            System.out.println("Pythonサーバーとのコネクションエラー");
             //e.printStackTrace();
         } catch(IOException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
         DoubleMatrix audioMat = this.gsa.analyzeGuitarAudio("data/zenon.wav");
         DoubleMatrix result = null;
         //System.out.println(audioMat);
-	}
-
-
+    }
 }

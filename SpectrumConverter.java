@@ -79,9 +79,27 @@ public class SpectrumConverter extends SPModule {
     		return null;
     	}
 	}
+	public DoubleMatrix createDoubleMatrix() {
+		try {
+	        DoubleMatrix matrix = MathUtils.createDoubleMatrix(
+	        		list.get(0).length(), list.size());
+	        for (int i = 0; i < list.size(); i++) {
+	            DoubleArray array = list.get(i);
+	            for (int j = 0; j < array.length(); j++) {
+	                matrix.set(i, j, array.get(j)); 
+	            }
+	        }
+	        return matrix;
+    	} catch(Exception e) {
+    		return null;
+    	}
+		
+	}
 	public void execute(Object[] src, TimeSeriesCompatible[] dest) throws InterruptedException {
 		ComplexArray cmpArray = (ComplexArray)src[0];
 		DoubleArray dblArray = this.convertComplexArrayToDoubleArray(cmpArray);
+		
+		list.add(dblArray);
 
 		list.add(dblArray);
 
