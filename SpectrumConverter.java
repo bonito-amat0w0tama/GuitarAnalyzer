@@ -49,7 +49,7 @@ public class SpectrumConverter extends SPModule {
     		return null;
     	}
 	}
-	public DoubleMatrix createDoubleMatrix() {
+	public DoubleMatrix createDoubleMatrix___() {
 //		/*try {
 //			DoubleMatrix matrix = MathUtils.createDoubleMatrix(
 //				list.size(), list.get(0).length());

@@ -74,7 +74,7 @@ class externalCodeReceiver():
                 val =  struct.pack('f', matrix[i,j])
                 buff = buff + val
 
-        self.printUnpackMatrix(buff)
+        #self.printUnpackMatrix(buff)
         self.clientsock.send(buff)
 
     # FIXME: メソッドの設計(clientsockなど）
@@ -129,6 +129,7 @@ class externalCodeReceiver():
                         self.printSize(size)
                         rows = self.readInt(self.clientsock)
                         cols = self.readInt(self.clientsock)
+                        self.printRowsAndCols(rows, cols)
                         matrix = self.getMatrix(rows, cols, size, self.clientsock)
                         self.printMatrix(matrix)
                         self.stack.append(matrix)
@@ -178,6 +179,13 @@ class externalCodeReceiver():
                 end += 4
 
         print matrix
+
+        #for i in range(matrix.shape[0]):
+        #    for j in range(matrix.shape[1]):
+        #        print matrix[i,j]
+
+    def getPseudoInverseMatrix(self, mat):
+        return np.linalg.pinv(mat)
 
     def printUnpackMatrix(self, buff):
         print "------------"
@@ -235,6 +243,8 @@ class externalCodeReceiver():
 
         V = np.array(V)
         print "Target matrix"
+        print V.shape[0]
+        print V.shape[1]
         print V
 
         fctr = nimfa.mf(V, seed = 'random_vcol', method = 'lsnmf', rank = 40, max_iter = 10)
@@ -243,9 +253,14 @@ class externalCodeReceiver():
 
         W = fctr_res.basis()
         print "Basis matrix"
+        print "test"
+        print W.shape[0]
+        print W.shape[1]
         print W
         H = fctr_res.coef()
         print "Coef"
+        print H.shape[0]
+        print H.shape[1]
         print H
 
         print "Estimate"

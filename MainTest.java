@@ -16,7 +16,9 @@ import static org.hamcrest.core.Is.is;
 public class MainTest {
     private GuitarAudioAnalyzer gaa = new GuitarAllNoteAnalyzer();
     private GuitarAudioAnalyzer gsa = new GuitarSpectrumAnalyzer();
-    private DoubleMatrix H, W;
+    private DoubleMatrix W;
+    private DoubleMatrix H;
+    private DoubleMatrix Wp;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -27,6 +29,8 @@ public class MainTest {
     public void DoubleMatrixが返って来るかどうか() {
         DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
         String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
+        //String code = "W,H = self.nmfMatrix(self.pop())\nWp = self.getPseudoInverseMatrix(W)\nself.push(Wp)";//\nself.push(H)\nself.push(Wp)";
+        //String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)\nWp = self.getPseudoInverseMatrix(W)\nself.push(Wp)";
 
         // Tcp/ipで飛ばう
         try {
@@ -34,10 +38,13 @@ public class MainTest {
                 new ExternalCodeAdapter("localhost", 1111);
             eca.pushDoubleMatrix(allNote);
             eca.pushCode(code);
-            DoubleMatrix H = (DoubleMatrix)eca.pop();
-            System.out.println("H: " + MathUtils.toString1(H));
-            DoubleMatrix W = (DoubleMatrix)eca.pop();
+            H = (DoubleMatrix)eca.pop();
+            System.out.println("Helo");
+            W = (DoubleMatrix)eca.pop();
+            //Wp = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));
+            System.out.println("H: " + MathUtils.toString1(H));
+            //System.out.println("Wp: " + MathUtils.toString1(Wp));
             //eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {

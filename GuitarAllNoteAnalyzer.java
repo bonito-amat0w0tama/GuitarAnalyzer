@@ -32,7 +32,6 @@ public class GuitarAllNoteAnalyzer extends GuitarAudioAnalyzer {
             e.printStackTrace();
             return null;
         }
-
         if (!(this._wav == null)) {
             this._winSldr.setInputData(this._wav);
         } else {
