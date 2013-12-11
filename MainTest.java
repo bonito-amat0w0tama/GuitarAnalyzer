@@ -27,19 +27,27 @@ public class MainTest {
 
     @Test
     public void DoubleMatrixが返って来るかどうか() {
-        DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
-        String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
+	    DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
+        //String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
         //String code = "W,H = self.nmfMatrix(self.pop())\nWp = self.getPseudoInverseMatrix(W)\nself.push(Wp)";//\nself.push(H)\nself.push(Wp)";
         //String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)\nWp = self.getPseudoInverseMatrix(W)\nself.push(Wp)";
+
+	    String code = 
+	    		"W,H = self.nmfMatrix(self.pop())\n" +
+	    		"self.push(W)\n" +
+	    		"self.push(H)\n" +
+	    		"self.pushMatrix(self.pop())\n" +
+	    		"self.pushMatrix(self.pop())\n";
+	    
+	    
 
         // Tcp/ipで飛ばう
         try {
             ExternalCodeAdapter eca =
                 new ExternalCodeAdapter("localhost", 1111);
-            eca.pushDoubleMatrix(allNote);
+//            eca.pushDoubleMatrix(allNote);
             eca.pushCode(code);
             H = (DoubleMatrix)eca.pop();
-            System.out.println("Helo");
             W = (DoubleMatrix)eca.pop();
             //Wp = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));

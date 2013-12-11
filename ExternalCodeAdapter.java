@@ -8,6 +8,11 @@ public class ExternalCodeAdapter {
 	private OutputStream outstream;
 	private InputStream instream;
 	private ByteOrder DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
+	
+	
+	private int recvSum = 0;
+	private int sendSum = 0;
+	private boolean zeroFlag = false;
 	public ExternalCodeAdapter(String hostname, int port) throws IOException {
 		socket = new Socket(hostname, port);
 		outstream = socket.getOutputStream();
@@ -15,6 +20,7 @@ public class ExternalCodeAdapter {
 	}
 
 	private int readInt(InputStream instream) throws IOException {
+recvSum += 4;
 		byte[] buff = new byte[4];
 		instream.read(buff);
 		ByteBuffer bb = ByteBuffer.wrap(buff);
@@ -23,6 +29,7 @@ public class ExternalCodeAdapter {
 	}
 
 	private String readHead(InputStream instream) throws IOException {
+recvSum +=4;
 		byte[] buff = new byte[4];
 		instream.read(buff);
 		return new String(buff);
@@ -32,13 +39,26 @@ public class ExternalCodeAdapter {
 		ByteBuffer buff = ByteBuffer.wrap(bytes);
 		buff.order(DEFAULT_ENDIAN);
 		int nrows = buff.getInt();
+recvSum += 4;
 		int ncols = buff.getInt();
+recvSum += 4;
 		System.out.println("nrows:" + nrows);
 		System.out.println("ncols:" + ncols);
 		DoubleMatrix matrix = MathUtils.createDoubleMatrix(nrows, ncols);
-		for (int i = 0; i < nrows; i++)
-			for (int j = 0; j < ncols; j++)
-				matrix.set(i, j, buff.getFloat());
+		for (int i = 0; i < nrows; i++) {
+			for (int j = 0; j < ncols; j++) {
+				float val = buff.getFloat();
+recvSum += 4;
+				if (val == 0.0 && !zeroFlag) {
+					System.out.println("rows:" + i + "\n" + "cols:" + j);
+					System.out.println("recvSum:" + recvSum);
+					System.out.println("sendSum:" + sendSum);
+					zeroFlag = true;
+				}
+				matrix.set(i, j, val);
+			}
+		}
+System.out.println("recvSum:" + recvSum);
 		return matrix;
 	}
 
@@ -51,6 +71,8 @@ public class ExternalCodeAdapter {
 			instream.read(data);
 			DoubleMatrix matrix = getMatrix(data);
 			return matrix;
+		} else if(head.equals("eror")) { //送ったコードなどにエラーが発生した場合
+			throw new IOException("Header : " + head);
 		} else {
 			throw new IOException("Invalid header: " + head);
 		}
@@ -68,6 +90,8 @@ public class ExternalCodeAdapter {
 		buff.put(bCode);
 		outstream.write(buff.array());
 		outstream.flush();
+		
+sendSum += bCode.length + 8;
 	}
 
 	public void pushDoubleMatrix(DoubleMatrix matrix) throws IOException {
@@ -79,6 +103,7 @@ public class ExternalCodeAdapter {
 		buff.put((byte)'t');
 		buff.put((byte)'a');
 		buff.putInt(matrix.nrows() * matrix.ncols() * 4 + 8);
+		System.out.println(matrix.nrows() * matrix.ncols() * 4 + 8);
 		buff.putInt(matrix.nrows());
 		buff.putInt(matrix.ncols());
 		for (int i = 0; i < matrix.nrows(); i++)
@@ -86,6 +111,8 @@ public class ExternalCodeAdapter {
 				buff.putFloat((float)matrix.get(i, j));
 		outstream.write(buff.array());
 		outstream.flush();
+		
+sendSum += matrix.nrows() * matrix.ncols() * 4 +16;
 	}
 
 	public void pushEnd() throws IOException {

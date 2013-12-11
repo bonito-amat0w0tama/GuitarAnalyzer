@@ -5,7 +5,7 @@
 
 import socket
 import sys
-import struct
+import struct 
 import numpy as np
 import scipy.sparse as sp
 import nimfa
@@ -13,7 +13,7 @@ import os
 import json
 import datetime
 
-class externalCodeReceiver():
+class Junk_sendMat():
     def __init__(self, host, port):
         self.stack = []
         self.byteSizeInt = 4
@@ -25,19 +25,18 @@ class externalCodeReceiver():
         self.sendSum = 0
 
 
-    def connectClient(self):
+        self.clientsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientsock.connect((host,port))
+
+
+
+    def connectServer(self):
         #AF_INET:IPv4 インターネット・プロトコル
         #SOCK_STREAM:TCP/IPを用いたSTREAM型のソケット
-        self.serversock = socket.socket(socket.AF_INET, 
+        self.clientsock = socket.socket(socket.AF_INET, 
                 socket.SOCK_STREAM)
-
         #host,portでバインドする
-        self.serversock.bind((host,port))
-
-        #リクエストの接続待ちキューを1に設定し、 #接続要求の準備をする
-        self.serversock.listen(1)
-        print "waiting..."
-        self.clientsock, self.clientAddres = self.serversock.accept()
+        self.clientsock.bind((self.host,self.port))
 
     # FIXME: name of clientsock
     def readHeader(self, clientsock):
@@ -47,7 +46,7 @@ class externalCodeReceiver():
         return str(header)
 
     def readInt(self, clientsock):
-        # buffersize = 4
+        # BUFFERSIZE = 4
         #print "buff"
         buff = clientsock.recv(self.byteSizeInt)
         self.recvSum += self.byteSizeInt
@@ -98,9 +97,6 @@ class externalCodeReceiver():
         self.sendSum += len(buff)
 
         print "sendSum:%d" % (self.sendSum)
-
-        # for i in list:
-        #     print i
             
     def sendError(self):
         head = "eror"
@@ -110,86 +106,25 @@ class externalCodeReceiver():
         print "sendedError"
 
     # FIXME: メソッドの設計(clientsockなど）
-    def run(self):
+    def popTcp(self):
         stack = []
         requestCount = 1
         head = ''
-        self.connectClient()
 
-        while True:
-            try:
-                try:
-                    head = self.readHeader(self.clientsock)
-                except socket.error:
-                    print "headの読み込みエラー"
-                    head = ""
-                    self.connectClient()
+        head = self.readHeader(self.clientsock)
+        size = self.readInt(self.clientsock)
+        self.printSize(size)
+        rows = self.readInt(self.clientsock)
+        cols = self.readInt(self.clientsock)
+        self.printRowsAndCols(rows, cols)
+        matrix = self.getMatrix(rows, cols, size, self.clientsock)
+        self.printMatrix(matrix)
+        self.stack.append(matrix)
 
-                # headがendの時ここで終了しないとsizeの読み込みでsocet.errorが起きる
-                if head != "":
-                    if head == "end ":
-                        self.printRequestCount(requestCount)
-                        self.printHeader(head)
-                        requestCount += 1
-                        print "Server is end"
-                        break
+        print "recvSum:%d" % (self.recvSum)
 
-                    #size = self.readInt(self.clientsock)
-                    #self.printSize(size)
-
-                    if head == 'code':
-                        self.printRequestCount(requestCount)
-                        self.printHeader(head)
-                        requestCount += 1
-                        size = self.readInt(self.clientsock)
-                        self.printSize(size)
-                        #クライアント側から文字列をsize分受信する
-                        code = self.clientsock.recv(size)
-                        self.recvSum += size
-                        self.printCode(code)
-                        print "recvSum:%d" % (self.recvSum)
-
-                        try :
-                            # スコープ範囲の注意
-                            exec code in locals()
-                        except SyntaxError as e:
-                            print "=== エラー発生 ==="
-                            print "type:" + str(type(e))
-                            print "message:" + str(e)
-                            print str("実行コードにSyntaxErrorがあります")
-                            self.sendError()
-                            # エラーで終了したので再接続
-                            self.connectClient()
-
-                        # スタックが空になるまでJavaにおくる
-                        # while len(self.stack) > 0:
-                        #     self.pushMatrix(self.pop())
-
-                    elif head == 'data':
-                        self.printRequestCount(requestCount)
-                        self.printHeader(head)
-                        requestCount += 1
-                        size = self.readInt(self.clientsock)
-                        self.printSize(size)
-                        rows = self.readInt(self.clientsock)
-                        cols = self.readInt(self.clientsock)
-                        self.printRowsAndCols(rows, cols)
-                        matrix = self.getMatrix(rows, cols, size, self.clientsock)
-                        self.printMatrix(matrix)
-                        self.stack.append(matrix)
-                        #self.nmfMatrix(matrix)
-
-                        print "recvSum:%d" % (self.recvSum)
-
-                    #elif head is 'end ' or size == 0:
-                        #break
-
-            except socket.error:
-                #print str(type(e))
-                print "Javaプログラムが不正終了した"
-                self.connectClient()
-
-        self.clientsock.close()
+            #elif head is 'end ' or size == 0:
+                #break
 
     def push(self, matrix):
         print "----"
@@ -213,7 +148,6 @@ class externalCodeReceiver():
         for i in range(length):
             head = head+ struct.unpack('c', buff[i])[0]
         return head
-
 
     # FIXME: unncode
     def convertBinaryToMatirx(self, buff, rows, cols, begin):
@@ -361,8 +295,41 @@ class externalCodeReceiver():
     def createZeroMatrix(self, rows, cols):
         return np.zeros([rows, cols])
 
+    def pushCode(self, code):
+        buff = ""
+        buff = struct.pack("cccc", 'c', 'o', 'd', 'e')
+
+        buff += struct.pack('i', len(code))
+        buff += code 
+        self.clientsock.send(buff)
+
+
 if __name__ == '__main__':
     host = str('localhost')
     port = int(1111)
-    server = externalCodeReceiver(host, port)
-    server.run()
+    client = Junk_sendMat(host, port)
+
+    V = np.zeros([3333, 3333])
+    for i in range(V.shape[0]):
+        for j in range(V.shape[1]):
+            V[i,j] = np.random.rand() 
+    W = np.zeros([200, 4000])
+    for i in range(W.shape[0]):
+        for j in range(W.shape[1]):
+            W[i,j] = np.random.rand()
+    H = np.zeros([4000, 100])
+    for i in range(H.shape[0]):
+        for j in range(H.shape[1]):
+            H[i,j] = np.random.rand()
+
+    client.pushMatrix(V)
+    client.pushMatrix(W)
+    client.pushMatrix(H)
+
+    code = "self.pushMatrix(self.pop())\n" + "self.pushMatrix(self.pop())";
+
+    client.pushCode(code)
+    X = client.popTcp()
+    Y = client.popTcp()
+    client.clientsock.close()
+
