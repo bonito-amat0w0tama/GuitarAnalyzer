@@ -12,6 +12,7 @@ import nimfa
 import os
 import json
 import datetime
+import time
 
 class externalCodeReceiver():
     def __init__(self, host, port):
@@ -31,13 +32,36 @@ class externalCodeReceiver():
         self.serversock = socket.socket(socket.AF_INET, 
                 socket.SOCK_STREAM)
 
-        #host,portでバインドする
-        self.serversock.bind((host,port))
+        numConnectTry = 0
+        numEndTry = 30
+        while numConnectTry < numEndTry:
+            numConnectTry += 1 
+            try:
+                #host,portでバインドする
+                self.serversock.bind((self.host, self.port))
+                # if bind is succseed
+                print "Connecting Succseed"
+                break
+            except socket.error as e:
+                print "===接続エラー==="
+                print str(e)
+                print "接続回数:%d" % (numConnectTry)
+                print "5秒後,再接続します"
+                print "=================\n"
+                time.sleep(5)
+
+        if self.serversock == None:
+            print "end_server_by_error"        
+            sys.exit()
 
         #リクエストの接続待ちキューを1に設定し、 #接続要求の準備をする
         self.serversock.listen(1)
-        print "waiting..."
+        print "waiting_ClientConnet...\n"
         self.clientsock, self.clientAddres = self.serversock.accept()
+
+    def closeSocket(self):
+        self.serversock.close()
+        self.clientsock.close()
 
     # FIXME: name of clientsock
     def readHeader(self, clientsock):
@@ -120,19 +144,26 @@ class externalCodeReceiver():
             try:
                 try:
                     head = self.readHeader(self.clientsock)
-                except socket.error:
+                except socket.error as e:
                     print "headの読み込みエラー"
-                    head = ""
+                    print str(e)
+                    head = "exception"
+                    # Java側が異常な終了をしたため再接続
+                    self.closeSocket()
                     self.connectClient()
 
                 # headがendの時ここで終了しないとsizeの読み込みでsocet.errorが起きる
-                if head != "":
+                if head != "exception":
                     if head == "end ":
                         self.printRequestCount(requestCount)
                         self.printHeader(head)
                         requestCount += 1
-                        print "Server is end"
-                        break
+                        # print "Server is end"
+                        # break
+
+                        print "ClientProgram_end"
+                        self.closeSocket()
+                        self.connectClient()
 
                     #size = self.readInt(self.clientsock)
                     #self.printSize(size)
@@ -159,6 +190,7 @@ class externalCodeReceiver():
                             print str("実行コードにSyntaxErrorがあります")
                             self.sendError()
                             # エラーで終了したので再接続
+                            self.closeSocket()
                             self.connectClient()
 
                         # スタックが空になるまでJavaにおくる
@@ -184,12 +216,13 @@ class externalCodeReceiver():
                     #elif head is 'end ' or size == 0:
                         #break
 
-            except socket.error:
-                #print str(type(e))
+            except socket.error as e:
+                print str(e)
                 print "Javaプログラムが不正終了した"
+                self.closeSocket()
                 self.connectClient()
 
-        self.clientsock.close()
+        self.closeSocket()
 
     def push(self, matrix):
         print "----"
@@ -300,24 +333,20 @@ class externalCodeReceiver():
         
 #         X = sp.rand(V.shape[0], V.shape[1], density=1).tocsr()
         # NMFの際の、基底数やイテレーションの設定
-        rank = 10
-        maxIter = 20
+        rank = 40 
+        maxIter = 100 
         method = "lsnmf"
         
 #         initiarizer = nimfa.methods.seeding.random_vcol.Random_vcol()
         initiarizer = nimfa.methods.seeding.random.Random()
         initW, initH = initiarizer.initialize(V, rank, {})
-        
-        date = datetime.datetime.today()
-        filePath = "../jsonData/" + "NMF_result" + str(date)
 
-        fctr = nimfa.mf(V, seed = 'random_vcol', method = 'lsnmf', rank = 10, max_iter = 10)
+        fctr = nimfa.mf(V, seed = 'random_vcol', method = method, rank = rank, max_iter = maxIter)
         # fctr = nimfa.mf(V, method = "lsnmf", rank = rank, max_iter = maxIter, W = initW, H = initH)
         fctr_res = nimfa.mf_run(fctr)
 
         W = fctr_res.basis()
         print "Basis matrix"
-        print "test"
         print W.shape[0]
         print W.shape[1]
         print W
@@ -342,24 +371,30 @@ class externalCodeReceiver():
         # Print actual number of iterations performed
         print "Iterations: %d" % sm['n_iter']
 
-        # # ファイルが存在しない場合のみ、Jsonファイルを生成
-        # if not os.path.isfile(filePath):
-        #     file = open(filePath, "w")
-        #     data = {
-        #             "initW": initW,
-        #             "initH": initH,
-        #             "rank": rank,
-        #             "matIter": maxIter,
-        #             "method": method,
-        #             "factr_res": fctr_res
-        #             }
-        #     json.dump(data, file)
-        #     file.close()
-
         return W, H
 
     def createZeroMatrix(self, rows, cols):
         return np.zeros([rows, cols])
+
+    def writeDataToJson(self, name, data):
+        try:
+            date = datetime.datetime.today()
+
+            filePath = "../jsonData/" + str(date.year) + "-" + str(date.month) + "-" +str(date.day) + "-" + str(date.hour) + ":" + str(date.minute) + "_" + name + ".json"
+
+            # ファイルが存在しない場合のみ、Jsonファイルを生成
+            if not os.path.isfile(filePath):
+                file = open(filePath, "w")
+                json.dump(data, file)
+                file.close()
+                print "Writing_josn_Succeed"
+            else:
+                print "File_exists"
+        except Exception as e:
+            print type(e)
+
+
+
 
 if __name__ == '__main__':
     host = str('localhost')

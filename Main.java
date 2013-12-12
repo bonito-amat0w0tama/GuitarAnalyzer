@@ -14,22 +14,31 @@ public class Main {
 
 		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
 
-        String code = "W,H = self.nmfMatrix(self.pop())\n" +
+        String code = "V = self.pop()\n" +
+        		"W,H = self.nmfMatrix(V)\n" +
         		"self.push(W)\n" +
         		"self.push(H)\n" +
+        		"Wp = self.getPseudoInverseMatrix(W)\n" +
+        		"self.push(Wp)\n" +
         		"self.pushMatrix(self.pop())\n" +
-        		"self.pushMatrix(self.pop())";
-
+        		"self.pushMatrix(self.pop())\n" +
+        		"self.pushMatrix(self.pop())\n" +
+        		"self.writeDataToJson('test', {'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist()})";
+			          
         // Tcp/ipで飛ばう
         try {
             ExternalCodeAdapter eca = 
                 new ExternalCodeAdapter("localhost", 1111);
             eca.pushDoubleMatrix(allNote);
             eca.pushCode(code);
+
             DoubleMatrix H = (DoubleMatrix)eca.pop();
             System.out.println("H: " + MathUtils.toString1(H));
             DoubleMatrix W = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));
+            DoubleMatrix Wp = (DoubleMatrix)eca.pop();
+            System.out.println("Wp: " + MathUtils.toString1(Wp));
+
             eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {

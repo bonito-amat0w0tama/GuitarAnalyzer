@@ -71,6 +71,7 @@ System.out.println("recvSum:" + recvSum);
 	}
 
 	public Object pop() throws IOException {
+		System.out.println("Pop");
 		InputStream in = instream;
 		String head = readHead(in);
 		if (head.equals("data")) {
@@ -87,7 +88,6 @@ System.out.println("recvSum:" + recvSum);
 				int readSize = size - readSum;
 				len = in.read(data, readSum, readSize);
 			}
-
 			DoubleMatrix matrix = getMatrix(data);
 
 			return matrix;
@@ -100,6 +100,7 @@ System.out.println("recvSum:" + recvSum);
 	}
 
 	public void pushCode(String code) throws IOException {
+		System.out.println("PushCode");
 		byte[] bCode = code.getBytes();
 		ByteBuffer buff = ByteBuffer.allocate(bCode.length + 8);
 		buff.order(DEFAULT_ENDIAN);
@@ -116,6 +117,7 @@ sendSum += bCode.length + 8;
 	}
 
 	public void pushDoubleMatrix(DoubleMatrix matrix) throws IOException {
+		System.out.println("PushDoubleMatrix");
 		ByteBuffer buff =
 				ByteBuffer.allocate(matrix.nrows() * matrix.ncols() * 4 + 16);
 		buff.order(DEFAULT_ENDIAN);
