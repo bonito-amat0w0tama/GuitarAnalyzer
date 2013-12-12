@@ -14,7 +14,11 @@ public class Main {
 
 		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
 
-        String code = "W,H = self.nmfMatrix(self.pop())\nself.push(W)\nself.push(H)";
+        String code = "W,H = self.nmfMatrix(self.pop())\n" +
+        		"self.push(W)\n" +
+        		"self.push(H)\n" +
+        		"self.pushMatrix(self.pop())\n" +
+        		"self.pushMatrix(self.pop())";
 
         // Tcp/ipで飛ばう
         try {
@@ -26,7 +30,7 @@ public class Main {
             System.out.println("H: " + MathUtils.toString1(H));
             DoubleMatrix W = (DoubleMatrix)eca.pop();
             System.out.println("W: " + MathUtils.toString1(W));
-            //eca.pushEnd();
+            eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {
         	System.out.println("Pythonサーバーとのコネクションエラー");

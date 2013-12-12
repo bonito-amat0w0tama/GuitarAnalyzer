@@ -25,16 +25,17 @@ public class JunkTCP {
 //				"print self.pop()\n" +
 //				"self.printStack()\n";
 				
-//				"W,H = self.nmfMatrix(self.pop())\n" +
-//				"self.push(W)\n" +
-//				"self.push(H)\n" +
+				"W,H = self.nmfMatrix(self.pop())\n" +
+				"self.push(W)\n" +
+				"self.push(H)\n" +
 				
 				"self.pushMatrix(self.pop())\n" + 
 				"self.pushMatrix(self.pop())";
 
-		DoubleMatrix sm1 = createAllOneMatrix(3333, 3333);
-		DoubleMatrix sm2 = createAllOneMatrix(200, 4000);
-		DoubleMatrix sm3 = createAllOneMatrix(4000, 100);
+		DoubleMatrix sm1 = createAllOneMatrix(100, 333);
+//		DoubleMatrix sm2 = createAllOneMatrix(200, 4000);
+//		DoubleMatrix sm3 = createAllOneMatrix(4000, 100);
+//		DoubleMatrix sm4 = createAllOneMatrix(4000, 100);
 
 		
 	    // Tcp/ipで飛ばう
@@ -42,18 +43,18 @@ public class JunkTCP {
 	        ExternalCodeAdapter eca = 
 	            new ExternalCodeAdapter("localhost", 1111);
             eca.pushDoubleMatrix(sm1);
-            eca.pushDoubleMatrix(sm2);
-            eca.pushDoubleMatrix(sm3);
+//			eca.pushDoubleMatrix(sm2);
+//            eca.pushDoubleMatrix(sm3);
             //eca.pushDoubleMatrix(V);
             //eca.pushDoubleMatrix(V);
             eca.pushCode(code);
-            DoubleMatrix Z = (DoubleMatrix)eca.pop();
-            System.out.println(Z);
-            DoubleMatrix ss3 = (DoubleMatrix)eca.pop();
+            DoubleMatrix H = (DoubleMatrix)eca.pop();
+			System.out.println(H);
+//            DoubleMatrix ss3 = (DoubleMatrix)eca.pop();
             //System.out.println("H: " + MathUtils.toString1(H));
-//            DoubleMatrix W = (DoubleMatrix)eca.pop();
-//            System.out.println("W: " + MathUtils.toString1(W));
-			//eca.pushEnd();
+            DoubleMatrix W = (DoubleMatrix)eca.pop();
+            System.out.println("W: " + MathUtils.toString1(W));
+			eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {
         	System.out.println("=== エラー発生 ===");

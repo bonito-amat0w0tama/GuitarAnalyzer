@@ -28,8 +28,6 @@ class Junk_sendMat():
         self.clientsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientsock.connect((host,port))
 
-
-
     def connectServer(self):
         #AF_INET:IPv4 インターネット・プロトコル
         #SOCK_STREAM:TCP/IPを用いたSTREAM型のソケット
