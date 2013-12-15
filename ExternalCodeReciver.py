@@ -7,12 +7,14 @@ import socket
 import sys
 import struct
 import numpy as np
-import scipy.sparse as sp
+import scipy.linalg as sl
+import scipy.sparse as sps
 import nimfa
 import os
 import json
 import datetime
 import time
+
 
 class externalCodeReceiver():
     def __init__(self, host, port):
@@ -266,7 +268,7 @@ class externalCodeReceiver():
         #        print matrix[i,j]
 
     def getPseudoInverseMatrix(self, mat):
-        return np.linalg.pinv(mat)
+        return sl.pinv(mat)
 
     def printUnpackMatrix(self, buff):
         print "------------"
@@ -334,7 +336,7 @@ class externalCodeReceiver():
 #         X = sp.rand(V.shape[0], V.shape[1], density=1).tocsr()
         # NMFの際の、基底数やイテレーションの設定
         rank = 40 
-        maxIter = 100 
+        maxIter = 2000 
         method = "lsnmf"
         
 #         initiarizer = nimfa.methods.seeding.random_vcol.Random_vcol()
@@ -356,8 +358,8 @@ class externalCodeReceiver():
         print H.shape[1]
         print H
 
-#         print "Estimate"
-#         print np.dot(W, H)
+        print "Estimate"
+        print np.dot(W, H)
 
 #         print 'Rss: %5.4f' % fctr_res.fit.rss()
 #         print 'Evar: %5.4f' % fctr_res.fit.evar()
