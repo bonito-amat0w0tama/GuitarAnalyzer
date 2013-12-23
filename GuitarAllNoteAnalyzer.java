@@ -47,7 +47,7 @@ public class GuitarAllNoteAnalyzer extends GuitarAudioAnalyzer {
 
             }
         }
-        DoubleMatrix mat = this._sg.getSpectrogram();
+        DoubleMatrix mat = this._sg.getSpectrogram2();
 
         return mat;
     }
