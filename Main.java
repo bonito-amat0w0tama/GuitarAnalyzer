@@ -9,27 +9,29 @@ import jp.crestmuse.cmx.processing.*;
 
 public class Main {
 
-	public static void main(String[] args) {
-		GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
+    public static void main(String[] args) {
+        GuitarAllNoteAnalyzer gaa = new GuitarAllNoteAnalyzer();
 
-		DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
+        // DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/guitar.wav");
+        DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/guitar.wav");
 
         String code = "V = self.pop()\n" +
-        		"W,H = self.nmfMatrix(V)\n" +
+        		"W,H = self.nmfMatrix(V, 'nmf', 10, 1000)\n" +
         		"self.push(W)\n" +
         		"self.push(H)\n" +
         		"Wp = self.getPseudoInverseMatrix(W)\n" +
         		"self.push(Wp)\n" +
+                "self.pushMatrix(self.pop())\n" +
         		"self.pushMatrix(self.pop())\n" +
         		"self.pushMatrix(self.pop())\n" +
-        		"self.pushMatrix(self.pop())\n" +
-        		"self.writeDataToJson('test', {'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist()})";
-			          
+                "self.writeDataToJson(name='zenon', data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist()}, dateFlag=True)";
+
         // Tcp/ipで飛ばう
         try {
             ExternalCodeAdapter eca = 
-                new ExternalCodeAdapter("localhost", 1111);
+                new ExternalCodeAdapter("localhost", 2222);
             eca.pushDoubleMatrix(allNote);
+            allNote = null;
             eca.pushCode(code);
 
             DoubleMatrix H = (DoubleMatrix)eca.pop();
@@ -42,13 +44,10 @@ public class Main {
             eca.pushEnd();
             eca.close();
         } catch(ConnectException e) {
-        	System.out.println("Pythonサーバーとのコネクションエラー");
-            //e.printStackTrace();
+            System.out.println("Pythonサーバーとのコネクションエラー");
+            e.printStackTrace();
         } catch(IOException e) {
         	e.printStackTrace();
         }
-        
-        
-
 	}
 }

@@ -14,7 +14,7 @@ public class SpectrogramGenerator extends SPModule{
 	    //System.out.println(count);
 	    count++;
 
-	    System.err.println(count);
+	    //System.err.println(count);
 
 	    ComplexArray spec = (ComplexArray)src[0];
 	    float[] powsec = new float[spec.length()];
@@ -52,17 +52,17 @@ public class SpectrogramGenerator extends SPModule{
 	        		list2.get(0).length, list2.size());
 	        int size = list2.size();
 	        for (int j = 0; j < size; j++) {
-		    float[] array = list2.remove(0);
-		    for (int i = 0; i < array.length; i++)
-			matrix.set(i, j, array[i]);
-		    //	            ComplexArray array = list2.get(0);
-		    //	            for (int i = 0; i < array.length(); i++) {
-		    //	                matrix.set(i, j, sqrt(array.getReal(i) * array.getReal(i) 
-		    //	                		+ array.getImag(i) * array.getImag(i)));
-		    //	            }
-		    //		    list2.remove(0);
+                float[] array = list2.remove(0);
+                for (int i = 0; i < array.length; i++)
+                    matrix.set(i, j, array[i]);
+//ComplexArray array = list2.get(0);
+//for (int i = 0; i < array.length(); i++) {
+//matrix.set(i, j, sqrt(array.getReal(i) * array.getReal(i) 
+//+ array.getImag(i) * array.getImag(i)));
+//}
+//list2.remove(0);
 	        }
-	        return matrix;
+            return matrix;
     	} catch(Exception e) {
     		return null;
     	}

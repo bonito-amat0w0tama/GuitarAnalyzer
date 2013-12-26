@@ -194,6 +194,17 @@ class externalCodeReceiver():
                             # エラーで終了したので再接続
                             self.closeSocket()
                             self.connectClient()
+                        except TypeError as e:
+                            print "=== エラー発生 ==="
+                            print "type:" + str(type(e))
+                            print "message:" + str(e)
+                            print str("実行コードにTypeErrorがあります")
+                        finally:
+                            self.sendError()
+                            # エラーで終了したので再接続
+                            self.closeSocket()
+                            self.connectClient()
+
 
                         # スタックが空になるまでJavaにおくる
                         # while len(self.stack) > 0:
@@ -321,7 +332,7 @@ class externalCodeReceiver():
         exec code
         print '----end--------'
 
-    def nmfMatrix(self, V):
+    def nmfMatrix(self, V, method, rank, maxIter):
         print "---"
         print "NMF"
         print "---"
@@ -335,11 +346,11 @@ class externalCodeReceiver():
         
 #         X = sp.rand(V.shape[0], V.shape[1], density=1).tocsr()
         # NMFの際の、基底数やイテレーションの設定
-        rank = 40 
-        maxIter = 2000 
-        method = "lsnmf"
+        # rank = 8 
+        # maxIter = 2000 
+        # method = "snmf"
         
-#         initiarizer = nimfa.methods.seeding.random_vcol.Random_vcol()
+#         init2arizer = nimfa.methods.seeding.random_vcol.Random_vcol()
         initiarizer = nimfa.methods.seeding.random.Random()
         initW, initH = initiarizer.initialize(V, rank, {})
 
@@ -361,28 +372,31 @@ class externalCodeReceiver():
         print "Estimate"
         print np.dot(W, H)
 
-#         print 'Rss: %5.4f' % fctr_res.fit.rss()
-#         print 'Evar: %5.4f' % fctr_res.fit.evar()
-#         print 'K-L divergence: %5.4f' % fctr_res.distance(metric = 'kl')
-#         print 'Sparseness, W: %5.4f, H: %5.4f' % fctr_res.fit.sparseness()
+        print 'Rss: %5.4f' % fctr_res.fit.rss()
+        print 'Evar: %5.4f' % fctr_res.fit.evar()
+        print 'K-L divergence: %5.4f' % fctr_res.distance(metric = 'kl')
+        print 'Sparseness, W: %5.4f, H: %5.4f' % fctr_res.fit.sparseness()
 
-        sm = fctr_res.summary()
-        print "Rss: %8.3f" % sm['rss']
-        # Print explained variance.
-        print "Evar: %8.3f" % sm['evar']
-        # Print actual number of iterations performed
-        print "Iterations: %d" % sm['n_iter']
+        # sm = fctr_res.summary()
+        # print "Rss: %8.3f" % sm['rss']
+        # # Print explained variance.
+        # print "Evar: %8.3f" % sm['evar']
+        # # Print actual number of iterations performed
+        # print "Iterations: %d" % sm['n_iter']
 
         return W, H
 
     def createZeroMatrix(self, rows, cols):
         return np.zeros([rows, cols])
 
-    def writeDataToJson(self, name, data):
+    def writeDataToJson(self, name, data, dateFlag=True):
         try:
-            date = datetime.datetime.today()
-
-            filePath = "../jsonData/" + str(date.year) + "-" + str(date.month) + "-" +str(date.day) + "-" + str(date.hour) + ":" + str(date.minute) + "_" + name + ".json"
+            if dateFlag:
+                date = datetime.datetime.today()
+                dateStr = str(date.year) + "-" + str(date.month) + "-" +str(date.day) + "-" + str(date.hour) + ":" + str(date.minute)
+                filePath = "../../jsonData/" + name + "_" + dateStr + ".json"
+            else:
+                filePath = "../../jsonData/" + name + ".json" 
 
             # ファイルが存在しない場合のみ、Jsonファイルを生成
             if not os.path.isfile(filePath):
@@ -393,6 +407,7 @@ class externalCodeReceiver():
             else:
                 print "File_exists"
         except Exception as e:
+            print str(e)
             print type(e)
 
 
