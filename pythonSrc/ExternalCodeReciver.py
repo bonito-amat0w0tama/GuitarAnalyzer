@@ -8,12 +8,15 @@ import sys
 import struct
 import numpy as np
 import scipy.linalg as sl
-import scipy.sparse as sps
+#import scipy.sparse as sps
 import nimfa
 import os
 import json
 import datetime
 import time
+import pylab as plt
+import Utils
+import traceback
 
 
 class externalCodeReceiver():
@@ -85,7 +88,7 @@ class externalCodeReceiver():
 
     def getMatrix(self, rows, cols, size, clientsock):
         # rows, cols の8バイト分マイナス
-        dataSize = size - 8
+        #dataSize = size - 8
         matrix = np.zeros((rows, cols))
         for i in range(rows):
             for j in range(cols):
@@ -136,7 +139,7 @@ class externalCodeReceiver():
 
     # FIXME: メソッドの設計(clientsockなど）
     def run(self):
-        stack = []
+        #stack = []
         requestCount = 1
         head = ''
         self.connectClient()
@@ -183,21 +186,14 @@ class externalCodeReceiver():
 
                         try :
                             # スコープ範囲の注意
-                            exec code in locals()
-                        except SyntaxError as e:
+                            #exec code in locals()
+                            exec code in globals()
+                        except (SyntaxError, TypeError, NameError, IndexError) as e:
                             print "=== エラー発生 ==="
                             print "type:" + str(type(e))
                             print "message:" + str(e)
-                            print str("実行コードにSyntaxErrorがあります")
-                            self.sendError()
-                            # エラーで終了したので再接続
-                            self.closeSocket()
-                            self.connectClient()
-                        except TypeError as e:
-                            print "=== エラー発生 ==="
-                            print "type:" + str(type(e))
-                            print "message:" + str(e)
-                            print str("実行コードにTypeErrorがあります")
+                            print "実行コードに" + str(type(e)) + "があります"
+                            traceback.print_exc()
                             self.sendError()
                             # エラーで終了したので再接続
                             self.closeSocket()
@@ -381,7 +377,10 @@ class externalCodeReceiver():
         # # Print actual number of iterations performed
         # print "Iterations: %d" % sm['n_iter']
 
-        return W, H
+        # プロットの際に不具合が生じるため,numpy.ndarray型に変換
+        NW = np.asarray(W)
+        NH = np.asarray(H)
+        return NW, NH
 
     def createZeroMatrix(self, rows, cols):
         return np.zeros([rows, cols])
@@ -406,6 +405,8 @@ class externalCodeReceiver():
         except Exception as e:
             print str(e)
             print type(e)
+
+	
 
 
 
