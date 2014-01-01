@@ -17,9 +17,11 @@ import time
 import pylab as plt
 import Utils
 import traceback
+import numpy.linalg as nl
 
 
 class externalCodeReceiver():
+    u = Utils.NMFUtils
     def __init__(self, host, port):
         self.stack = []
         self.byteSizeInt = 4
@@ -51,6 +53,7 @@ class externalCodeReceiver():
                 print str(e)
                 print "接続回数:%d" % (numConnectTry)
                 print "5秒後,再接続します"
+                traceback.print_exc()
                 print "=================\n"
                 time.sleep(5)
 
@@ -151,6 +154,7 @@ class externalCodeReceiver():
                 except socket.error as e:
                     print "headの読み込みエラー"
                     print str(e)
+                    traceback.print_exc()
                     head = "exception"
                     # Java側が異常な終了をしたため再接続
                     self.closeSocket()
@@ -225,6 +229,7 @@ class externalCodeReceiver():
             except socket.error as e:
                 print str(e)
                 print "Javaプログラムが不正終了した"
+                traceback.print_exc()
                 self.closeSocket()
                 self.connectClient()
 
@@ -405,16 +410,15 @@ class externalCodeReceiver():
         except Exception as e:
             print str(e)
             print type(e)
-
-	
-
-
-
+            traceback.print_exc()
 
 if __name__ == '__main__':
-    host = str('localhost')
-    port = int(1111)
-    host = str(sys.argv[1])
-    port = int(sys.argv[2])
+    if len(sys.argv) > 1:
+        host = str(sys.argv[1])
+        port = int(sys.argv[2])
+    else:
+        host = str('localhost')
+        port = int(1111)
+
     server = externalCodeReceiver(host, port)
     server.run()
