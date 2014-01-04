@@ -17,6 +17,7 @@ H = data['H']
 SW = data['SW']
 SH = data['SH']
 Wp = sl.pinv(W) 
+Wp = sl.pinv(SW) 
 
 h = np.dot(Wp, V)
 Hd = np.dot(Wp, V)

@@ -68,15 +68,30 @@ public class SendingCodeGenerator {
         		"W,H = server.nmfMatrix(V, 'nmf', 10, 500)\n" +
 				"SW, SH = Utils.NMFUtils.sortBasisAndCoef(W, H)\n" +
         		"Wp = server.getPseudoInverseMatrix(SW)\n" +
-        		"server.push(SW)\n" +
-				"server.push(SH)\n" +
-				"server.push(Wp)\n" +
-        		"server.pushMatrix(server.pop())\n" +
-        		"server.pushMatrix(server.pop())\n" +
-        		"server.pushMatrix(server.pop())\n" +
+        		"server.setMatrix(data=V, name='V')\n" +
+        		"server.setMatrix(data=SW, name='SW')\n" +
+				"server.setMatrix(data=SH, name='SH')\n" +
+				"server.setMatrix(data=Wp, name='Wp')\n" +
+        		"server.sendMatrix(server.takeMatrix(name='V'))\n" +
+        		"server.sendMatrix(server.takeMatrix(name='SW'))\n" +
+        		"server.sendMatrix(server.takeMatrix(name='SH'))\n" +
+        		"server.sendMatrix(server.takeMatrix(name='Wp'))\n" +
         		"print nl.norm(np.dot(SW, SH))\n" +
         		"print nl.norm(np.dot(W, H))\n" +
         		"data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist(), 'SW': SW.tolist(), 'SH': SH.tolist()}\n" +
                 "server.writeDataToJson(name='doremi', data=data, dateFlag=True)\n"; 
 //                "server.writeDataToJson(name='doremi', data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist(), 'SW': SW.toList(), 'SH: SH.tolist()}, dateFlag=True)"; 
+        
+        String pilotTrans = 
+        		"path = '../../jsonData/doremi_2014-1-5-2:39.json'\n" +
+        		"data = server.nu.readJson(path=path)\n" +
+        		"data = server.nu.json2NpArray(data)\n" +
+        		"V = data['V']\n" +
+        		"SW = data['SW']\n" +
+        		"SH = data['SH']\n" +
+        		"Wp = data['Wp']\n" +
+        		"server.sendMatrix(V)\n" +
+        		"server.sendMatrix(SW)\n" +
+        		"server.sendMatrix(SH)\n" +
+        		"server.sendMatrix(Wp)\n";
 }

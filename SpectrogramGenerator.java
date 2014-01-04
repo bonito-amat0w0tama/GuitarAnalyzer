@@ -19,8 +19,8 @@ public class SpectrogramGenerator extends SPModule{
 	    ComplexArray spec = (ComplexArray)src[0];
 	    float[] powsec = new float[spec.length()];
 	    for (int i = 0; i < spec.length(); i++) {
-		powsec[i] = (float)sqrt(spec.getReal(i) * spec.getReal(i) +
-					spec.getImag(i) * spec.getImag(i));
+            powsec[i] = (float)sqrt(spec.getReal(i) * spec.getReal(i) +
+                        spec.getImag(i) * spec.getImag(i));
 	    }
 	    list2.add(powsec);
 	    //        list2.add((ComplexArray)src[0]);

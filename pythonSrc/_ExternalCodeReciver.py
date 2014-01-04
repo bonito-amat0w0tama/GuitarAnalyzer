@@ -20,9 +20,8 @@ import traceback
 import numpy.linalg as nl
 
 
-class ExternalCodeReceiver():
-    nu = Utils.NMFUtils
-    dict = {}
+class externalCodeReceiver():
+    u = Utils.NMFUtils
     def __init__(self, host, port):
         self.stack = []
         self.byteSizeInt = 4
@@ -100,7 +99,7 @@ class ExternalCodeReceiver():
                 self.recvSum += 4
         return  matrix
 
-    def sendMatrix(self, matrix):
+    def pushMatrix(self, matrix):
 
         buff = ''
         head = 'data'
@@ -123,7 +122,7 @@ class ExternalCodeReceiver():
                 list.append(uVal)
 
         print "----------"
-        print "sendMatrix"
+        print "PushMatrix"
 
         self.printUnpackMatrix(buff)
         self.clientsock.send(buff)
@@ -193,7 +192,7 @@ class ExternalCodeReceiver():
                             # スコープ範囲の注意
                             #exec code in locals()
                             exec code in globals()
-                        except (SyntaxError, TypeError, NameError, IndexError, AttributeError) as e:
+                        except (SyntaxError, TypeError, NameError, IndexError) as e:
                             print "=== エラー発生 ==="
                             print "type:" + str(type(e))
                             print "message:" + str(e)
@@ -220,6 +219,7 @@ class ExternalCodeReceiver():
                         matrix = self.getMatrix(rows, cols, size, self.clientsock)
                         self.printMatrix(matrix)
                         self.stack.append(matrix)
+                        #self.nmfMatrix(matrix)
 
                         print "recvSum:%d" % (self.recvSum)
 
@@ -235,7 +235,7 @@ class ExternalCodeReceiver():
 
         self.closeSocket()
 
-    def push(self, matrix, name):
+    def push(self, matrix):
         print "----"
         print "push"
         print "----"
@@ -244,28 +244,12 @@ class ExternalCodeReceiver():
         # ここでPushMatrixしたことがバグの原因
         # self.pushMatrix(matrix)
 
-    def setMatrix(self, data, name):
-        print "----"
-        print "setMatrix"
-        print "----"
-
-        self.dict[name] = data 
-        self.printDict()
-
     def pop(self):
         print "---"
         print "pop"
         print "---"
         self.printStack()
         return self.stack.pop()
-
-    def takeMatrix(self, name):
-        print "---"
-        print "takeMatrix"
-        print "---"
-        self.printDict()
-        return self.dict[name]
-
 
     # FIXME: length is bad
     def convertBinaryToString(self, buff, length):
@@ -321,15 +305,9 @@ class ExternalCodeReceiver():
     def printStack(self):
         print "stack_length -> %d" % (len(self.stack))
         print "Values in Stack"
-#        for i in range(len(self.stack)):
-#            print "%d -> " % (i+1)
-#            print self.stack[i]
-
-        count = 1
-        for val in self.stack:
-            print "%d -> " % (count)
-            print val
-
+        for i in range(len(self.stack)):
+            print "%d -> " % (i+1)
+            print self.stack[i]
         print "-------------"
 
     def printSize(self, size):
@@ -341,15 +319,6 @@ class ExternalCodeReceiver():
     def printCode(self, code):
         print 'Code->'
         print '%s' % (code)
-
-    def printDict(self):
-        print "Dist_length-> %d" % (len(self.dict))
-        print "Values in dic"
-        for key, val in self.dict.iteritems(): 
-            print "%s -> " % (key)
-            print self.dict[key]
-        print "-------------"
-
 
     def printRequestCount(self, count):
         print "------------------"
@@ -451,6 +420,5 @@ if __name__ == '__main__':
         host = str('localhost')
         port = int(1111)
 
-    server = ExternalCodeReceiver(host, port)
+    server = externalCodeReceiver(host, port)
     server.run()
-
