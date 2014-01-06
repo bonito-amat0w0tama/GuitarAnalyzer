@@ -83,7 +83,7 @@ public class SendingCodeGenerator {
 //                "server.writeDataToJson(name='doremi', data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist(), 'SW': SW.toList(), 'SH: SH.tolist()}, dateFlag=True)"; 
         
         String pilotTrans = 
-        		"path = '../../jsonData/doremi_2014-1-5-2:39.json'\n" +
+        		"path = '../../jsonData/doremi_normal_2014-1-6-14:31.json'\n" +
         		"data = server.nu.readJson(path=path)\n" +
         		"data = server.nu.json2NpArray(data)\n" +
         		"V = data['V']\n" +
@@ -94,4 +94,33 @@ public class SendingCodeGenerator {
         		"server.sendMatrix(SW)\n" +
         		"server.sendMatrix(SH)\n" +
         		"server.sendMatrix(Wp)\n";
+        
+        String pilotNmf = 
+        		"V = server.pop()\n" +
+        		"W, H, sm = server.nmfMatrix(V, 'nmf', 132, 3000)\n" +
+				"SW, SH = Utils.NMFUtils.sortBasisAndCoef(W, H)\n" +
+        		"Wp = server.getPseudoInverseMatrix(SW)\n" +
+        		"server.sendMatrix(V)\n" +
+        		"server.sendMatrix(SW)\n" +
+        		"server.sendMatrix(SH)\n" +
+        		"server.sendMatrix(Wp)\n" +
+        		"data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist(), 'SW': SW.tolist(), 'SH': SH.tolist()}\n" +
+                "server.writeDataToJson(name='zenon', data=data, dateFlag=True)\n"; 
+        		
+        String nmfDoremi = 
+        		"V = server.pop()\n" +
+        		"W, H, sm = server.nmfMatrix(V, 'nmf', 8, 1000)\n" +
+				"SW, SH = Utils.NMFUtils.sortBasisAndCoef(W, H)\n" +
+        		"Wp = server.getPseudoInverseMatrix(SW)\n" +
+        		"server.sendMatrix(V)\n" +
+        		"server.sendMatrix(SW)\n" +
+        		"server.sendMatrix(SH)\n" +
+        		"server.sendMatrix(Wp)\n" +
+        		"data={'V': V.tolist(), 'W': W.tolist(), 'H': H.tolist(), 'Wp': Wp.tolist(), 'SW': SW.tolist(), 'SH': SH.tolist()}\n" +
+                "server.writeDataToJson(name='doremi_short', data=data, dateFlag=True)\n"; 
+        
+        String saveMat = 
+        		"V = server.pop()\n" +
+        		"data={'V': V.tolist()}\n" +
+                "server.writeDataToJson(name='chord', data=data, dateFlag=True)\n"; 
 }

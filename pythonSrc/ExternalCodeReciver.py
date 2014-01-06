@@ -406,7 +406,8 @@ class ExternalCodeReceiver():
         print 'K-L divergence: %5.4f' % fctr_res.distance(metric = 'kl')
         print 'Sparseness, W: %5.4f, H: %5.4f' % fctr_res.fit.sparseness()
 
-        # sm = fctr_res.summary()
+        sm = fctr_res.summary()
+        print type(sm)
         # print "Rss: %8.3f" % sm['rss']
         # # Print explained variance.
         # print "Evar: %8.3f" % sm['evar']
@@ -416,7 +417,7 @@ class ExternalCodeReceiver():
         # プロットの際に不具合が生じるため,numpy.ndarray型に変換
         NW = np.asarray(W)
         NH = np.asarray(H)
-        return NW, NH
+        return NW, NH, sm
 
     def createZeroMatrix(self, rows, cols):
         return np.zeros([rows, cols])

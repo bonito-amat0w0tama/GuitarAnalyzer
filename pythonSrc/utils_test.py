@@ -7,30 +7,43 @@ noteList = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
 
 nu = Utils.NMFUtils
 #path = "../../jsonData/zenon_2013-12-27-15:21.json"
-path = "../../jsonData/doremi_2014-1-2-7:55.json"
-data = nu.readJson(path=path)
-data = nu.json2NpArray(data)
+doremiPath = "../../jsonData/doremi_normal_2014-1-6-16:47.json"
+#doremiPath = "../../jsonData/doremi_short_2014-1-6-17:30.json"
+doremiPath = "../../jsonData/doremi_short_2014-1-6-17:44.json"
 
-V = data['V']
-W = data['W']
-H = data['H']
-SW = data['SW']
-SH = data['SH']
-Wp = sl.pinv(W) 
+doremi = nu.readJson(path=doremiPath)
+doremi = nu.json2NpArray(doremi)
+
+#waonPath = "../../jsonData/waon_2014-1-6-16:29.json"
+waonPath = "../../jsonData/chord_2014-1-6-17:13.json"
+waon = nu.readJson(path=waonPath)
+waon = nu.json2NpArray(waon)
+
+V = doremi['V']
+W = doremi['W']
+H = doremi['H']
+SW = doremi['SW']
+SH = doremi['SH']
 Wp = sl.pinv(SW) 
 
-h = np.dot(Wp, V)
-Hd = np.dot(Wp, V)
+WV = waon['V'] 
+
+Hd = np.dot(Wp, WV)
 junkW, SHd = nu.sortBasisAndCoef(W, Hd) 
 
 for i in range(Hd.shape[1]):
-    index = nu.putMaxIndex(Hd[:,i])
-    print "index:", i
-    try:
-        print noteList[index]
-    except:
-        print index
-print h.shape
+    now = Hd[:,i]
+    index = nu.putMaxIndex(now)
+    max = np.max(now) 
+    if max >= 0.0:
+        try:
+            print noteList[index]
+            print "maxVal:", max
+            print "index:", i
+        except:
+            print index
+            print "maxVal:", max
+            print "index:", i
 
 #rows, cols = h.shape
 #print rows
@@ -46,5 +59,9 @@ print h.shape
 
 #nu.createBasisGraph(SW, 1)
 #print nu.putMaxIndex(h)
-nu.createCoefGraph(SHd, 1)
-#plt.show()
+#nu.createBasisGraph(W, 1)
+#nu.createCoefGraph(SH, 1)
+nu.createCoefGraph(data=Hd, nFig=2, lim=True, ymin=0)
+#nu.createBasisGraph(data=SW, nFig=1)
+#nu.createCoefGraph(data=SH, nFig=2, lim=True, ymin=0)
+plt.show()

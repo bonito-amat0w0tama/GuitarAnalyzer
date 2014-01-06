@@ -52,7 +52,7 @@ class NMFUtils:
         plt.xlabel('frequency [Hz]')
 
     @staticmethod
-    def createCoefGraph(data, nFig):
+    def createCoefGraph(data, nFig, lim, ymin):
         plt.figure(nFig)
         plt.suptitle('Coef')
         nBase = data.shape[0]
@@ -72,6 +72,8 @@ class NMFUtils:
             plt.tick_params(labelleft='off', labelbottom='off')
             # FIXME: Arguments of X
             # plt.plot(timeLine, data[i,:])
+            if lim:
+                plt.ylim(ymin=ymin)
             plt.plot(timeLine, data[i,:])
         # Beacuse I want to add lable in bottom, xlabel is declaration after loop.
         plt.tick_params(labelleft='off', labelbottom="on")

@@ -8,43 +8,37 @@ import jp.crestmuse.cmx.math.ComplexArray;
 import static java.lang.Math.*;
 
 public class AudioTranscriptioner extends SPModule{
-	private RealMatrix m_wp;
-	private char[] noteList = {'c', 'd', 'e', 'f', 'g', 'a', 'b', 'c'};
+	private RealMatrix wp;
 	public void execute(Object[] src, TimeSeriesCompatible[] dest) 
 			throws InterruptedException {
+
 	    ComplexArray spec = (ComplexArray)src[0];
+	    // パワースペクトルグラムに変換
+	    // RealMatrix型に変換するために、double[][]型に
 	    double[][] powsec = new double[spec.length()][1];
 	    for (int i = 0; i < spec.length(); i++) {
             powsec[i][0] = (double)sqrt(spec.getReal(i) * spec.getReal(i) +
                         spec.getImag(i) * spec.getImag(i));
 	    }
 	    RealMatrix in = MatrixUtils.createRealMatrix(powsec);
-//	    System.out.println("powsec:" + powsec.length);
-//	    System.out.println("in:" + in.getRowDimension() + ":" + in.getColumnDimension());
-//	    System.out.println("wp:" + m_wp.getRowDimension() + ":" + m_wp.getColumnDimension());
-
-	    RealMatrix mat = m_wp.multiply(in);
-//	    System.out.println("note:" + note.getRowDimension() + ":" + note.getColumnDimension());
-
-	    
-	    String note = this.transcription(mat);
+	    RealVector actVec = this.wp.multiply(in).getColumnVector(0);
+	    String note = this.transcription(actVec);
 	    dest[0].add(note);
-//	    System.out.println((ComplexArray)src[0]);
 	}
 
-	private String transcription(RealMatrix mat) {
-        String[] note = {"c", "d", "e", "f", "g", "a", "b", "c"};
-        String dest;
-        RealVector vec = mat.getColumnVector(0);
-        System.out.println(vec.getDimension());
+	private String transcription(RealVector vec) {
+        String[] noteList = {"c", "d", "e", "f", "g", "a", "b", "c"};
+        String dest = "None";
         int index = vec.getMaxIndex(); 
         double val = vec.getMaxValue();
-        try {
-        	dest = note[index];
-            System.out.println(dest + ":" + val);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            dest = "err";
-            System.out.println(dest + ":" + val);
+        if (val > 0.2) {
+            if (index < noteList.length) {
+                dest = noteList[index];
+                System.out.println(dest + ":" + val);
+            } else {
+                dest = String.valueOf(index);
+                System.out.println(dest + ":" + val);
+            }
         }
         return dest;
 	}
@@ -57,6 +51,6 @@ public class AudioTranscriptioner extends SPModule{
 	}
 	
 	public void setWp(RealMatrix Wp) {
-		m_wp = Wp;
+		this.wp = Wp;
 	}
 }

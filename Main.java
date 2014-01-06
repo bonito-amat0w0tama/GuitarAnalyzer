@@ -7,7 +7,7 @@ import jp.crestmuse.cmx.filewrappers.*;
 import jp.crestmuse.cmx.math.*;
 import jp.crestmuse.cmx.processing.*;
 
-import org.apache.commons.math3.linear.*;
+import org.apache.commons.math.linear.*;
 
 
 public class Main {
@@ -16,7 +16,7 @@ public class Main {
         SendingCodeGenerator scg = new SendingCodeGenerator();
 
         // DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/guitar.wav");
-        DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/guitar.wav");
+        DoubleMatrix allNote = gaa.analyzeGuitarAudio("./data/zenon.wav");
 
         DoubleMatrix V = null, SH = null, SW =null, Wp = null;
         // Tcp/ipで飛ばう
@@ -26,7 +26,7 @@ public class Main {
             eca.pushDoubleMatrix(allNote);
             // メモリの解放
             allNote = null;
-            eca.pushCode(scg.pilot);
+            eca.pushCode(scg.pilotNmf);
 
             V = (DoubleMatrix)eca.pop();
 //            System.out.println("H: " + MathUtils.toString1(SH));
@@ -43,29 +43,6 @@ public class Main {
             e.printStackTrace();
         } catch(IOException e) {
         	e.printStackTrace();
-        }
-        
-        
-        MatrixManager mm = new MatrixManager();
-        RealMatrix RV = mm.toRealMatrix(V);
-        RealMatrix RH = mm.toRealMatrix(SH);
-        RealMatrix RW = mm.toRealMatrix(SW);
-        RealMatrix RWp = mm.toRealMatrix(Wp);
-        
-        System.out.println(RV.getRowDimension() + " " + RV.getColumnDimension());
-        System.out.println(RWp.getRowDimension() + " " + RWp.getColumnDimension());
-        RealMatrix mat = RWp.multiply(RV);
-        
-        char[] note = {'c', 'd', 'e', 'f', 'g', 'a', 'b', 'c'};
-        for (int i = 0; i < mat.getColumnDimension(); i++) {
-            RealVector vec = mat.getColumnVector(i);
-            int a = vec.getMaxIndex();
-            double b = vec.getMaxValue();
-            try {
-                System.out.println(i + ":" + note[a] + ":" + b);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println(i + ":" + a + ":" + b);
-            }
         }
 	}
 }
